@@ -1,0 +1,90 @@
+# TypeScript build info
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+build/
+out/
+*.js
+*.d.ts
+*.js.map
+# Keep config files
+!vitest.config.ts
+!vitest.config.js
+!postcss.config.js
+!tailwind.config.js
+
+# Bun
+bun.lockb
+.bun/
+bun-error.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+.coverage/
+
+# ESLint
+.eslintcache
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thums.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Testing
+.vitest/
+test-results/
+junit.xml
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+.cache/
+
+# Debugging
+.nvmrc
+.node-version
+
+# Package manager files (keep lock files in repo)
+.yarn/
+.pnp.*
+
+# Local development
+*.local
+
+# Performance profiling
+*.cpuprofile
+*.heapsnapshot
+
+# Editor backup files
+*.bak
+*.orig
