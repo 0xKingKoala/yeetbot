@@ -1,23 +1,25 @@
 # Yeet Bot V2
 
-A modular, rule-based bot for the Yeet game on Berachain with comprehensive logging, monitoring, and testing infrastructure.
+An automated bot for the Yeet V2 game on Berachain with real-time price calculation, web dashboard, and intelligent decision-making.
 
 ## Features
 
+- **Real-Time Price Calculation**: Calculates auction prices locally for zero-latency decisions
+- **Web Dashboard**: React-based UI for monitoring and control
+- **Terminal Dashboard**: Real-time CLI interface for monitoring bot activity
 - **Rule-Based Decision Engine**: Modular rules system for flexible strategies
-- **Comprehensive Logging**: Structured logging with file rotation and multiple transports
 - **Event-Driven Architecture**: Reacts to blockchain events in real-time
-- **Safety Features**: Circuit breakers, retry logic, and extensive validation
-- **Dry Run Mode**: Test strategies without spending real funds
-- **Extensive Configuration**: Environment-based configuration with validation
-- **Test Coverage**: Unit and integration tests for all components
+- **Safety Features**: Dry run mode, max spend limits, and safety rules
 - **Automatic BGT Claiming**: Claims and redeems BGT rewards periodically
+- **Force Yeet**: Manual control via dashboard or API
+- **P&L Tracking**: Comprehensive profit/loss tracking and statistics
 
 ## Quick Start
 
 1. **Install dependencies**:
    ```bash
    bun install
+   cd web && bun install
    ```
 
 2. **Configure environment**:
@@ -26,19 +28,21 @@ A modular, rule-based bot for the Yeet game on Berachain with comprehensive logg
    # Edit .env with your settings
    ```
 
-3. **Run in dry mode** (recommended for testing):
+3. **Run the bot with terminal dashboard**:
    ```bash
-   bun run start:dry
+   bun run start:dashboard
    ```
 
-4. **Run in production**:
+4. **Run the bot with web dashboard**:
    ```bash
-   DRY_RUN=false bun run start
+   bun run start:web
+   # Open browser to http://localhost:3000
    ```
 
-5. **Manually claim BGT** (optional - bot does this automatically):
+5. **Run web UI separately** (for development):
    ```bash
-   bun run claim
+   cd web && bun run dev
+   # Open browser to http://localhost:5173
    ```
 
 ## Configuration
@@ -69,11 +73,12 @@ The bot uses environment variables for configuration. See `.env.example` for all
 
 1. **BotRunner**: Main orchestration class
 2. **DecisionEngine**: Evaluates rules and makes yeet decisions
-3. **BlockchainService**: Handles all blockchain interactions
-4. **EventManager**: Monitors and processes blockchain events
-5. **StateManager**: Tracks game and auction state
-6. **Logger**: Comprehensive logging system
+3. **PriceCalculator**: Real-time price calculation using linear decay
+4. **BlockchainService**: Handles all blockchain interactions
+5. **EventManager**: Monitors and processes blockchain events
+6. **StateManager**: Tracks game and auction state with real-time prices
 7. **BGTClaimService**: Automatically claims and redeems BGT rewards
+8. **Dashboard Server**: WebSocket server for real-time UI updates
 
 ### Rules System
 
@@ -95,43 +100,36 @@ bun test
 
 # Watch mode
 bun run test:watch
-
-# Coverage report
-bun run test:coverage
 ```
 
-### Type Checking
+### Available Scripts
 
 ```bash
-bun run type-check
-```
+# Start with terminal dashboard
+bun run start:dashboard
 
-### Linting
+# Start with web dashboard  
+bun run start:web
 
-```bash
-# Check for issues
-bun run lint
+# Start bot only (no UI)
+bun run start
 
-# Auto-fix issues
-bun run lint:fix
-```
+# Claim BGT manually
+bun run claim
 
-### Development Mode
-
-```bash
-# Run with auto-reload
-bun run dev
+# Run all components
+bun run start:all
 ```
 
 ## Monitoring
 
 The bot provides comprehensive monitoring through:
 
-- **Console Logs**: Real-time activity with timestamps
-- **File Logs**: Rotating log files in `./logs` directory
-- **Metrics**: Performance metrics and statistics
-- **Health Checks**: Blockchain connection and service health
-- **Notifications**: Discord/SQS alerts for important events
+- **Web Dashboard**: Full-featured React UI at http://localhost:3000
+- **Terminal Dashboard**: Real-time CLI interface with colored output
+- **Console Logs**: Structured logging with timestamps
+- **WebSocket Updates**: Real-time state updates to connected clients
+- **P&L Tracking**: Win/loss statistics and profitability metrics
 
 ## Safety Features
 
@@ -141,46 +139,15 @@ The bot provides comprehensive monitoring through:
 - **Circuit Breakers**: Automatic shutdown on repeated errors
 - **Input Validation**: Comprehensive validation of all inputs
 
-## Usage Example
+## Web Dashboard Features
 
-```typescript
-import { 
-  createDecisionEngine, 
-  createDefaultConfig,
-  ProfitCalculator,
-  RuleContext 
-} from './src';
-
-// Create components
-const config = createDefaultConfig();
-config.ourWallets.add('0xYourWallet'.toLowerCase());
-
-const engine = createDecisionEngine();
-const calculator = new ProfitCalculator();
-
-// Create context from blockchain data
-const bgtRewards = calculator.calculateBGTRewards(
-  bgtPerSecond,
-  leaderTimestamp,
-  currentTimestamp
-);
-
-const profit = calculator.calculateProfitMetrics(currentPrice, bgtRewards);
-
-const context: RuleContext = {
-  auction: { /* auction state */ },
-  bgtRewards,
-  profit,
-  wallet: { /* wallet info */ },
-  config
-};
-
-// Get decision
-const decision = engine.evaluate(context);
-if (decision.shouldYeet) {
-  // Execute yeet with decision.suggestedGasMultiplier
-}
-```
+- **Real-time State Display**: Current price, leader, auction progress
+- **Rules Panel**: Live rule evaluations and decisions
+- **P&L Tab**: Profit/loss tracking with win rate and statistics
+- **History Tab**: Round-by-round auction history
+- **Activity Log**: Real-time bot activity feed
+- **Action Buttons**: Force yeet, pause/resume, claim BGT
+- **Stats Panel**: Session statistics and performance metrics
 
 ## Troubleshooting
 
@@ -200,19 +167,20 @@ LOG_LEVEL=debug bun run start
 
 ## Production Deployment
 
-1. Use environment-specific config files:
+1. Configure production environment:
    ```bash
-   cp .env.example .env.production
+   cp .env.example .env
+   # Set DRY_RUN=false for production
    ```
 
-2. Run with PM2 for process management:
+2. Build web UI:
    ```bash
-   pm2 start ecosystem.config.js
+   cd web && bun run build
    ```
 
-3. Monitor logs:
+3. Run in production:
    ```bash
-   tail -f logs/combined-*.log
+   NODE_ENV=production bun run start:web
    ```
 
 ## Security
